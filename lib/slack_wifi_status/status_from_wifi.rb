@@ -13,25 +13,28 @@ module SlackWifiStatus
     # Is the connected ssid in the ssid-list from a place?
     ##
 
-    def self.kontich_ssid?
-      SlackWifiStatus::Config.config['kontich_ssids'].include?(ssid)
-    end
+    def self.check_ssid(ssid)
+      if SlackWifiStatus::Config.config['kontich_ssids'].include?(ssid)
+        connected_to = 'kontich'
+      end
 
-    def self.gent_ssid?
-      SlackWifiStatus::Config.config['gent_ssids'].include?(ssid)
-    end
+      if SlackWifiStatus::Config.config['gent_ssids'].include?(ssid)
+        connected_to = 'gent'
+      end
 
-    def self.antwerpen_ssid?
-      SlackWifiStatus::Config.config['antwerpen_ssids'].include?(ssid)
-    end
+      if SlackWifiStatus::Config.config['antwerpen_ssids'].include?(ssid)
+        connected_to = 'antwerpen'
+      end
 
-    def self.home_ssid?
-      SlackWifiStatus::Config.config['home_ssids'].include?(ssid)
-    end
+      if SlackWifiStatus::Config.config['home_ssids'].include?(ssid)
+        connected_to = 'home'
+      end
 
-    def self.ontheroad_ssid?
-      puts SlackWifiStatus::Config.config['ontheroad_ssids']
-      SlackWifiStatus::Config.config['ontheroad_ssids'].include?(ssid)
+      if SlackWifiStatus::Config.config['ontheroad_ssids'].include?(ssid)
+        connected_to = 'ontheroad'
+      end
+
+      return connected_to
     end
 
     ##
@@ -39,15 +42,19 @@ module SlackWifiStatus
     ##
 
     def self.status_hash
-      if kontich_ssid?
+
+      connected_to = check_ssid(ssid)
+
+      case connected_to
+      when 'kontich'
         { message: '', emoji: ':kontich:' }
-      elsif gent_ssid?
+      when 'gent'
         { message: '', emoji: ':gent:' }
-      elsif antwerpen_ssid?
+      when 'antwerpen'
         { message: '', emoji: ':antwerp:' }
-      elsif home_ssid?
+      when 'home'
         { message: '', emoji: ':house:' }
-      elsif ontheroad_ssid?
+      when 'ontheroad'
         { message: '', emoji: '' }
       else
         { message: '', emoji: '' }
