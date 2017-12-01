@@ -22,6 +22,10 @@ module SlackWifiStatus
         connected_to = 'gent'
       end
 
+      if SlackWifiStatus::Config.config['hoi_ssids'].include?(ssid)
+        connected_to = 'hoi'
+      end
+
       if SlackWifiStatus::Config.config['antwerpen_ssids'].include?(ssid)
         connected_to = 'antwerpen'
       end
@@ -50,12 +54,14 @@ module SlackWifiStatus
         { message: '', emoji: ':kontich:' }
       when 'gent'
         { message: '', emoji: ':gent:' }
+      when 'hoi'
+        { message: '', emoji: ':hoi:' }
       when 'antwerpen'
         { message: '', emoji: ':antwerp:' }
       when 'home'
         { message: '', emoji: ':house:' }
       when 'ontheroad'
-        { message: '', emoji: '' }
+        { message: '', emoji: ':cola:' }
       else
         { message: '', emoji: '' }
       end
