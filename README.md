@@ -1,40 +1,47 @@
 # Slack Wifi Status
 
-Set your Slack status to either :house_with_garden: or :coffee: based on your wifi SSID.
+Set your Slack status to either :house_with_garden: or :coffee: based on your location.
 
-You list a set of SSIDs that count as being at home. If you're at home, then your status is set to
+You list a set of locations / strings that count as being at a certain place. If you're at that place, then your status is set to
 
-> :house_with_garden: At Home
+> :pick an emoji: My custom status
 
-If you are using an SSID not on the list, then your status is set to
+If you are at a location not on the list, then your status is set the `else`-default
 
 > :coffee: At a coffee shop
 
+
 ## Setup
 
-To setup, you'll need an OAUTH key for Slack and a list of SSIDs that count as being at home ([kinda detailed OAuth setup instructions](#detailed-oauth-instructions)).
+To setup, you'll need an OAUTH key for Slack and a list of locations.
 
-clone the repo:
+Clone the repo:
 
 ```
-git clone https://github.com/spatten/slack-wifi-status.git
+git clone git@bitbucket.org:mantebridts/slackupdatestatus.git
 ```
 Install the required gems:
 
 ```
 cd slack-wifi-status
 bundle install
+brew cask install corelocationcli
 ```
 
 Create a file in `config/slack.yml` that looks like this:
 
 ```yaml
----
 oauth_key: "xoxp-this-is-a-totally-real-oauth-key"
-home_ssids:
-  - Pretty Fly for a Wi-Fi
-  - FBI Surveillance Van 119871
-  - TellMyWiFiLoveHer
+kontich:
+  address:
+    - Kontich // This string is used for matchmaking against your current location, pick anything, such as a straat and number, or just the city or country
+  slack:
+    message: "@ Kontich HQ"
+    emoji: ":cronos:"
+else:
+  slack:
+    message: "Probably in a meeting ¯\_(ツ)_/¯"
+    emoji: ":spiral_calendar_pad:"
 ```
 
 You can test your setup by running
@@ -47,7 +54,11 @@ It should update your status on Slack.
 
 ## Automatically updating your status
 
-Setup a cron job that runs every five minutes and runs `bin/update-slack-status`, like this:
+Setup a cron job that runs every five minutes and runs `bin/update-slack-status`, use this command to use nano to edit the crontab-file:
+
+```export VISUAL=nano; crontab -e```
+
+and put this line in the file
 
 ```
 */5 * * * * cd /Users/yourname/path/to/code/slack-wifi-status && ./bin/update-slack-status > /dev/null 2> /dev/null
@@ -62,4 +73,3 @@ Create a new app for the organization you're going to be changing your status on
 You need to set the permissions needed. You need `users.profile:read` and `users.profile:write`.
 
 Slack will then give you an OAuth access token. Copy it and stick it in `config/slack.yml`.
-
