@@ -26,7 +26,8 @@ cd slack-wifi-status
 bundle install
 ```
 
-Create a file in `config/slack.yml` that looks like this:
+Create a file in `config/slack.yml` that looks like this.
+You can use `config/slack.yml.example` as a template.
 
 ```yaml
 ---

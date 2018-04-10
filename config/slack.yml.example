@@ -1,0 +1,20 @@
+##
+# Token for your slack user
+##
+oauth_key: "YOUR_TOKEN_HERE"
+location1:
+  address:
+    - Antwerp
+  slack:
+    message: "a custom message for location 1"
+    emoji: ":location1_emoji:"
+location2:
+  address:
+    - Ghent
+  slack:
+    message: "a custom message for location 2"
+    emoji: ":location2_emoji:"
+else:
+  slack:
+    message: ""
+    emoji: "cola:"
