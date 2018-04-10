@@ -33,7 +33,7 @@ Create a file in `config/slack.yml` that looks like this:
 ```yaml
 oauth_key: "xoxp-this-is-a-totally-real-oauth-key"
 kontich:
-  address: 
+  address:
     - Kontich // This string is used for matchmaking against your current location, pick anything, such as a straat and number, or just the city or country
   slack:
     message: "@ Kontich HQ"
@@ -54,7 +54,11 @@ It should update your status on Slack.
 
 ## Automatically updating your status
 
-Setup a cron job that runs every five minutes and runs `bin/update-slack-status`, like this:
+Setup a cron job that runs every five minutes and runs `bin/update-slack-status`, use this command to use nano to edit the crontab-file:
+
+```export VISUAL=nano; crontab -e```
+
+and put this line in the file
 
 ```
 */5 * * * * cd /Users/yourname/path/to/code/slack-wifi-status && ./bin/update-slack-status > /dev/null 2> /dev/null
