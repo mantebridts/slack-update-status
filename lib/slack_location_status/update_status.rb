@@ -2,14 +2,14 @@ require 'net/http'
 require 'uri'
 require 'json'
 
-module SlackWifiStatus
+module SlackLocationStatus
   # Set the emoji and status text on Slack
   class UpdateStatus
     def self.post(message: '', emoji: '')
       uri = URI.parse('https://slack.com/api/users.profile.set')
 
       payload = { status_text: message, status_emoji: emoji }.to_json
-      token = SlackWifiStatus::Config.config['oauth_key']
+      token = SlackLocationStatus::Config.config['oauth_key']
 
       uri.query = URI.encode_www_form(token: token, profile: payload)
 

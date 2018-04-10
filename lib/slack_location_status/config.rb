@@ -1,6 +1,6 @@
 require 'yaml'
 
-module SlackWifiStatus
+module SlackLocationStatus
   class Config
     def self.yaml_file
       File.join(File.dirname(__FILE__), '..', '..', 'config', 'slack.yml')
