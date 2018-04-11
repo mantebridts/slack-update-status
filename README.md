@@ -29,7 +29,7 @@ brew cask install corelocationcli
 Create a file in `config/slack.yml` that looks like this.
 You can use `config/slack.yml.example` as a template.
 
-Instructions for getting an OAuth-key are below.
+
 
 ```yaml
 oauth_key: "xoxp-this-is-a-totally-real-oauth-key"
@@ -44,6 +44,14 @@ else:
     message: "Probably in a meeting ¯\_(ツ)_/¯"
     emoji: ":spiral_calendar_pad:"
 ```
+
+Another example:
+
+![picture](config.png)
+
+
+Instructions for getting an OAuth-key are below.
+
 
 You can test your setup by running
 
