@@ -1,6 +1,14 @@
-##
-# Token for your slack user
-##
+##############################################################################################
+#  Config file for the slack-status-updater
+#
+#  - Get a Slack oauth-token
+#    More info about where to get it: https://bitbucket.org/mantebridts/slackupdatestatus
+#
+#  - Add locations (address)
+#    - Choose an emoji (https://www.webpagefx.com/tools/emoji-cheat-sheet/)
+#    - Choose a custom message
+##############################################################################################
+
 oauth_key: "YOUR_TOKEN_HERE"
 location1:
   address:
@@ -16,5 +24,5 @@ location2:
     emoji: ":location2_emoji:"
 else:
   slack:
-    message: ""
-    emoji: "cola:"
+    message: "At a coffee shop"
+    emoji: "coffee:"

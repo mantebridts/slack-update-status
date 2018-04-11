@@ -1,8 +1,8 @@
 # Slack Wifi Status
 
-Set your Slack status to either :house_with_garden: or :coffee: based on your location.
+Set your Slack status to either :house_with_garden: or :coffee: (or some custom emoji) based on your location.
 
-You list a set of locations / strings that count as being at a certain place. If you're at that place, then your status is set to
+You list a set of locations, if you're at that place, then your status is set to
 
 > :pick an emoji: My custom status
 
@@ -12,8 +12,6 @@ If you are at a location not on the list, then your status is set the `else`-def
 
 
 ## Setup
-
-To setup, you'll need an OAUTH key for Slack and a list of locations.
 
 Clone the repo:
 
@@ -31,14 +29,16 @@ brew cask install corelocationcli
 Create a file in `config/slack.yml` that looks like this.
 You can use `config/slack.yml.example` as a template.
 
+Instructions for getting an OAuth-key are below.
+
 ```yaml
 oauth_key: "xoxp-this-is-a-totally-real-oauth-key"
 kontich:
   address:
     - Kontich // This string is used for matchmaking against your current location, pick anything, such as a straat and number, or just the city or country
   slack:
-    message: "@ Kontich HQ"
-    emoji: ":cronos:"
+    message: "@ HQ"
+    emoji: ":house:"
 else:
   slack:
     message: "Probably in a meeting ¯\_(ツ)_/¯"
@@ -65,7 +65,10 @@ and put this line in the file
 */5 * * * * cd /Users/yourname/path/to/code/slack-wifi-status && ./bin/update-slack-status > /dev/null 2> /dev/null
 ```
 
+
 ## Detailed OAuth instructions
+
+To complete the setup, you'll need an OAUTH-key for Slack and a list of locations.
 
 Go to https://api.slack.com/apps
 
