@@ -76,12 +76,10 @@ and put this line in the file
 
 ## Detailed OAuth instructions
 
-To complete the setup, you'll need an OAUTH-key for Slack and a list of locations.
+To complete the setup, you'll need an legacy-token for Slack.
 
-Go to https://api.slack.com/apps
+Go to https://api.slack.com/custom-integrations/legacy-tokens
 
-Create a new app for the organization you're going to be changing your status on.
+Create a new token for the organization you're going to be changing your status on.
 
-You need to set the permissions needed. You need `users.profile:read` and `users.profile:write`.
-
-Slack will then give you an OAuth access token. Copy it and stick it in `config/slack.yml`.
+Slack will then give you an access token. Copy it and stick it in `config/slack.yml`.
