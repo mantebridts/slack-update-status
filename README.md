@@ -21,7 +21,7 @@ git clone git@bitbucket.org:mantebridts/slackupdatestatus.git
 Install the required gems:
 
 ```
-cd slack-wifi-status
+cd slackupdatestatus
 bundle install
 brew cask install corelocationcli
 ```
