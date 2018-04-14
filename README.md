@@ -1,6 +1,6 @@
-# Slack Wifi Status
+# Slack Update Status
 
-Set your Slack status to either :house_with_garden: or :coffee: (or some custom emoji) based on your location.
+Set your Slack status to a certain location, be it :house_with_garden: or :coffee: (or some custom emoji), based on your location.
 
 You list a set of locations, if you're at that place, then your status is set to
 
@@ -59,7 +59,7 @@ You can test your setup by running
 ./bin/update-slack-status
 ```
 
-It should update your status on Slack.
+It should update your status on Slack (don't forget to allow the script to access your location).
 
 ## Automatically updating your status
 
