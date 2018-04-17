@@ -18,17 +18,20 @@ Clone the repo:
 ```
 git clone git@bitbucket.org:mantebridts/slackupdatestatus.git
 ```
-Install the required gems:
+Install everything:
 
 ```
-cd slackupdatestatus
+xcode-select --install
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 bundle install
 brew cask install corelocationcli
+CoreLocationCLI -json
 ```
+
+The last line should output an address. If you see this, everything works fine.
 
 Create a file in `config/slack.yml` that looks like this.
 You can use `config/slack.yml.example` as a template.
-
 
 
 ```yaml
