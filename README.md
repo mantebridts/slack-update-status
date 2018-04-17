@@ -16,7 +16,7 @@ If you are at a location not on the list, then your status is set the `else`-def
 Clone the repo:
 
 ```
-git clone git@bitbucket.org:mantebridts/slackupdatestatus.git
+git clone git@github.com:mantebridts/slack-update-status.git
 ```
 Install the required gems:
 
