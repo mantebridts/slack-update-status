@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 
 services:
   mongodb:
@@ -25,4 +25,4 @@ services:
       - "3000:3000"
       - "443:8443"
     volumes:
-      - ./config/cert:/etc/letsencrypt
+      - /etc/letsencrypt:/config/cert/:/bot/config/cert

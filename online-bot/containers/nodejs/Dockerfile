@@ -4,10 +4,9 @@ WORKDIR /bot
 
 
 COPY package.json /bot
-COPY . /bot
+COPY models /bot/models
+COPY app.js /bot
 
-# RUN npm install --quiet || cat npm-debug.log
-RUN npm install
-RUN mkdir -p config/cert
+RUN npm install --quiet || cat npm-debug.log
 
 CMD ["npm", "run-script", "start"]

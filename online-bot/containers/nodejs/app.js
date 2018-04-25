@@ -9,6 +9,7 @@ const http = require('http');
 const https = require('https');
 
 const mongo_connection_string = 'mongodb://mongodb/earl';
+
 const privateKey = fs.readFileSync('./config/cert/keys/0000_key-certbot.pem', 'utf8');
 const certificate = fs.readFileSync('./config/cert/csr/0000_csr-certbot.pem', 'utf8');
 
