@@ -6,3 +6,8 @@
 /online-bot/containers/nodejs/config
 /online-bot/data
 /online-bot/containers/nodejs/node_modules
+
+#Ignore .DS_store and lockfiles
+*.DS_store
+*-lock.json
+*.lock
