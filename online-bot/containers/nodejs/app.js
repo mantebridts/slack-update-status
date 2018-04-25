@@ -10,8 +10,8 @@ const https = require('https');
 
 const mongo_connection_string = 'mongodb://mongodb/earl';
 
-const privateKey = fs.readFileSync('./config/cert/keys/0000_key-certbot.pem', 'utf8');
-const certificate = fs.readFileSync('./config/cert/csr/0000_csr-certbot.pem', 'utf8');
+//const privateKey = fs.readFileSync('./config/cert/keys/0000_key-certbot.pem', 'utf8');
+//const certificate = fs.readFileSync('./config/cert/csr/0000_csr-certbot.pem', 'utf8');
 
 // Connect to MongoDB
 mongoose.connect(mongo_connection_string);
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Temp fix for validating certificat
-app.use(express.static('cert'));
+app.use(express.static(''));
 
 // Capture Post
 app.post('/location', function(req, res){
@@ -49,10 +49,10 @@ app.post('/location', function(req, res){
 
 // Start server
 var httpServer = http.createServer(app);
-var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
+//var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
 
 httpServer.listen(3000);
-httpsServer.listen(8443);
+//httpsServer.listen(8443);
 
 // Run period task to clear the status of people who didn't send an update in the last 15min
 setInterval(clearStatuses, 1000*60*1);
