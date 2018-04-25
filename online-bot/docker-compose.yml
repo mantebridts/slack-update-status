@@ -25,4 +25,4 @@ services:
       - "3000:3000"
       - "443:8443"
     volumes:
-      - /etc/letsencrypt:/config/cert/:/bot/config/cert
+      - /etc/letsencrypt:/bot/config/cert
