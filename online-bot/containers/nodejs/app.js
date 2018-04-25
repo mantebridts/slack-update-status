@@ -1,5 +1,3 @@
-//Temp token = xoxp-349187893970-349776230930-352199970112-f3ba68112c6e5a262f75b998421c696d
-
 const { WebClient } = require('@slack/client');
 const mongoose = require('mongoose');
 const models = require('./models/index');
@@ -10,8 +8,9 @@ const https = require('https');
 
 const mongo_connection_string = 'mongodb://mongodb/earl';
 
-//const privateKey = fs.readFileSync('./config/cert/keys/0000_key-certbot.pem', 'utf8');
-//const certificate = fs.readFileSync('./config/cert/csr/0000_csr-certbot.pem', 'utf8');
+const privateKey = fs.readFileSync('./config/cert/live/api.nightknight.be/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('./config/cert/live/api.nightknight.be/fullchain.pem', 'utf8');
+
 
 // Connect to MongoDB
 mongoose.connect(mongo_connection_string);
@@ -44,15 +43,12 @@ app.post('/location', function(req, res){
 	res.status(200).send("ok");
 });
 
-// Temp fix for validating certificate
-app.use('/', express.static('cert'));
-
 // Start server
 var httpServer = http.createServer(app);
-//var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
+var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
 
 httpServer.listen(3000);
-//httpsServer.listen(8443);
+httpsServer.listen(8443);
 
 // Run period task to clear the status of people who didn't send an update in the last 15min
 setInterval(clearStatuses, 1000*60*1);
