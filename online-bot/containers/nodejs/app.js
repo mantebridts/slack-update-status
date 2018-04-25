@@ -21,9 +21,6 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// Temp fix for validating certificat
-app.use(express.static(''));
-
 // Capture Post
 app.post('/location', function(req, res){
 	var user = null;
@@ -46,6 +43,9 @@ app.post('/location', function(req, res){
 	// Send "ok", or nah
 	res.status(200).send("ok");
 });
+
+// Temp fix for validating certificate
+app.use('/', express.static('cert'));
 
 // Start server
 var httpServer = http.createServer(app);
