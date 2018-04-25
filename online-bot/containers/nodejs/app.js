@@ -21,6 +21,9 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+// Temp fix for validating certificat
+app.use(express.static('cert'));
+
 // Capture Post
 app.post('/location', function(req, res){
 	var user = null;
