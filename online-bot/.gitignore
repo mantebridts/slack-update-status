@@ -3,3 +3,6 @@ containers/nodejs/node_modules/
 
 #Ignore lock-files
 containers/nodejs/package-lock.json
+
+#Ignore data folder
+data
