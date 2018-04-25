@@ -1,1 +1,8 @@
-config/slack.yml
+#Ignore local logs and config
+/local-cron/log
+/local-cron/config/slack.yml
+
+#Ignore online packages, config and data
+/online-bot/containers/nodejs/config
+/online-bot/data
+/online-bot/containers/nodejs/node_modules
