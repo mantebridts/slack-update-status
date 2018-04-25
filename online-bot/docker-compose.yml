@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+  api:
+    build:
+      context: ./containers/nodejs/
+    networks:
+      - default
+    environment:
+      MODE: start
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    ports:
+      - "3000:3000"
+      - "443:8443"
