@@ -2,15 +2,16 @@
   "name": "Earl-Location-spy-status-updater",
   "version": "0.0.1",
   "description": "Captures local cronjob outputs and transforms them into Slack statusupdates",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon src/app.js"
   },
   "author": "Koen Everaert",
   "license": "ISC",
   "dependencies": {
     "@slack/client": "^4.1.0",
     "express": "^4.16.3",
-    "mongoose": "^5.0.16"
+    "mongoose": "^5.0.16",
+    "nodemon": "1.12.*"
   }
 }
