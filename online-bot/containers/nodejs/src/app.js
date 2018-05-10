@@ -206,20 +206,6 @@ app.get("/callback", function(req, res){
 							});
 						}
 					});
-	            
-					//Post new message to #general
-					const web = new WebClient(config.bot.access_token);
-					web.chat.postMessage({channel: "#general", text: "User got added to db!"})
-				  	.then((res) => {
-					    if(!res.ok){
-					    	//It's an error
-					    	console.log(res);
-					    }
-					  })
-				  	.catch(function(error){
-					  	console.log("# ------ ERROR ------ #");
-					  	console.log(error);
-				  	});
 	            }else{
 	            	//Respond with error for development
 		            res.status(200).send(obj);
