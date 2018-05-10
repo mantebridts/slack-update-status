@@ -58,10 +58,10 @@ const bot = {
 
 					//Match input against known commands
 					Object.keys(commands).forEach(function(command) {
-						var value = "";
-						if(value = message.text.match(commands[command].pattern)){
+						var matches = message.text.match(commands[command].pattern);
+						if(matches != null){
 							//Pattern matched, execute it
-							commands[command].exec(value, user).then(function(reply){
+							commands[command].exec(matches, user).then(function(reply){
 								output.reply = reply;
 								resolve(output);
 							}).catch(function(error){
@@ -71,6 +71,9 @@ const bot = {
 							});
 						}
 					});
+
+					//By now no response was ready, so let's just.. say gibberish
+					resolve(output);
 				}else{
 					//Ask user to authorize Bot
 					output = {
