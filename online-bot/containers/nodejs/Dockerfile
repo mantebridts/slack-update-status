@@ -6,6 +6,8 @@ WORKDIR /bot
 COPY package.json /bot
 COPY src/models /bot/src/models
 COPY src/pages /bot/src/pages
+COPY src/controllers /bot/src/controllers
+COPY src/config/config.js /bot/src/config/config.js
 COPY src/app.js /bot/src
 
 RUN npm install --quiet || cat npm-debug.log

@@ -160,7 +160,7 @@ app.get("/callback", function(req, res){
 			client_id: config.client_id,
 			client_secret: config.client_secret,
 			code: temp_code,
-			redirect_uri: "http://localhost/callback"
+			redirect_uri: "https://api.nightknight.be/callback"
 		};
 
 		var options = {
@@ -198,8 +198,11 @@ app.get("/callback", function(req, res){
 							res.status(200).send("User got updated in db");
 						}else{
 							const new_user = new models.User({token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, location: {}, last_active: new Date()});
-							new_user.save().then(function(u){
+							new_user.save().then(function(err, user){
 								res.status(200).send("User got added to db");
+
+								//Create a default location for this user
+								new models.Location({user_id: user.id, name: "Default", regex: [], status: {"status_text": "In a meeting", "status_emoji": ":calendar:"}}).save();
 							});
 						}
 					});

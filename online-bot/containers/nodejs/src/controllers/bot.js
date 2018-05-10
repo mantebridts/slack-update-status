@@ -48,7 +48,9 @@ const bot = {
 		return new Promise(function(resolve, reject){
 			var output = {
 				channel: message.channel, 
-				reply: "Didn't quite catch that.."
+				reply: {
+					text: "Didn't quite catch that..\nTry something like this:\n```add location: Name-of-location;regex-for-location;status-text;name-of-status-emoji(without ':') //Adds a new location\nlist locations //Lists your locations\n@Name-of-location //Force-updates location\nwhere am i //Returns last known position```"
+				}
 			};
 
 			//Check if user is already registered.
@@ -57,10 +59,12 @@ const bot = {
 					//Good, we know this user, start working
 
 					//Match input against known commands
+					var matched = false;
 					Object.keys(commands).forEach(function(command) {
 						var matches = message.text.match(commands[command].pattern);
 						if(matches != null){
 							//Pattern matched, execute it
+							matched = true;
 							commands[command].exec(matches, user).then(function(reply){
 								output.reply = reply;
 								resolve(output);
@@ -73,12 +77,16 @@ const bot = {
 					});
 
 					//By now no response was ready, so let's just.. say gibberish
-					resolve(output);
+					if(!matched){
+						resolve(output);
+					}
 				}else{
 					//Ask user to authorize Bot
 					output = {
 						channel: message.channel, 
-						reply: "Hi stranger, I don't know you at all.."
+						reply: {
+							text: "Hi stranger, I don't know you at all.."
+						}
 					};
 					resolve(output);
 				}
