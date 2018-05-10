@@ -31,13 +31,16 @@ setInterval(clearStatuses, 1000*60*10);
 
 //Helper functions
 function clearStatuses(){
-	//Something's off, function not supported in Mongoose, write workaround
-	/*models.User.findAndModify({ query: {last_active: { $lte: new Date() - 15*60*1000 }}, update: {location: {}}, new: true}, function(err, users){
+	models.User.find({last_active: { $lte: new Date() - 15*60*1000 }, location: { $ne: {address: "", id: ""}}}, function(err, users){
 		if(users){
 			// Loop over these users, and clear their statuses
 			for (var i = 0; i< users.length; i++){
+				//Update field in db
+				models.User.findOneAndUpdate({_id: users[i].id}, {location: { address: "", id: ""}}, function(err, user){
+					//Do nothing
+				})
 				_updateSlackStatus(users[i].token, {status_text: "", status_emoji: ""});
 			}
 		}
-	});*/
+	});
 }
