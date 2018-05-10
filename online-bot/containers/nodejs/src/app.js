@@ -27,21 +27,122 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+// Start server
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
+
+httpServer.listen(3000);
+httpsServer.listen(8443);
+
+//Start Slack-bot Earl
+bot.boot();
+
+//Routes
+
 // Capture Post
 app.post('/location', function(req, res){
-	var user = null;
-	models.User.findOneAndUpdate({token: req.body.token}, { last_active: new Date()}, function(err, u){
-		// If token is known, update 'last_active'-field, else throw error, cause this user shouldn't exist
-		if(u !== null){
-			// Great. Now post the statusmessage to Slack with this token
-			updateSlackStatus(req.body.token, req.body.status);
+	// Get user ID
+	models.User.findOne({token: req.body.token}, "user_id token", function(err, user){
+		if(user !== null){
+			//Continue with user, find matching location for this address
+			models.Location.find({user_id: user.user_id}, "_id name regex status", function(err, locations){
+				//Loop over locations and match regexes
+				var current_location = false;
+				for(var i=0; i < locations.length; i++){
+					var location = locations[i];
+					if(location.name == "Default" && !current_location){
+						current_location = location;
+					}else{
+						for(var j=0; j < location.regex.length; j++){
+							var matches = req.body.address.match(location.regex[j]);
+							if(matches !== null){
+								//We have a match!
+								current_location = location;
+							}
+						}
+					}
+				}
+				//Update the status of this user
+				//If by here the user had no matches, the default location will be used
+				_updateSlackStatus(user.token, current_location.status);
 
-			// Send "ok", or nah
-			res.status(200).send("ok");
+				//Update last location of user
+				models.User.findOneAndUpdate({user_id: user.user_id}, {last_active: new Date(), location: { "address": req.body.address, "_id": current_location._id}}, function(err, u){
+					//Doesn't really matter..
+				});
+
+				// Send "ok", or nah
+				res.status(200).send("ok");
+			});
 		}else{
 			res.status(404).send({ message: "User / token combination not found"});
 		}
 	});
+});
+
+//Captures button-responses from Slack
+app.post("/api", function(req, res){
+	//Interesting parts
+	var payload = JSON.parse(req.body.payload);
+	var data = {
+		"token": payload.token,
+		"callback_id": payload.callback_id,
+		"user_id": payload.user.id,
+		"original_message": payload.original_message,
+		"team_id": payload.team.id
+	};
+
+	// 1. Does the token matches what we know of Slack? (Is this request from Slack?)
+	if(config.verification_token == data.token){
+		// 1.1 Split callback_id, find action, target and id
+		var callback = data.callback_id.split("."), target = callback[0], action = callback[1], id = callback[2];
+
+		// 1.2 Remove location
+		switch(action){
+			case "delete":
+				switch(target){
+					case "location":
+						models.Location.findOne({_id: id, user_id: data.user_id}).remove(function(err, location){
+							//Replace original_message attachment with response and send it back
+							console.log(err);
+							console.log(location);
+							for(var i = 0; i < data.original_message.attachments.length; i++){
+								if(data.original_message.attachments[i].callback_id == data.callback_id){
+									//It's this one, check if the location even existed (might be an old message)
+									if(location.n <= 0){
+										data.original_message.attachments[i] = {
+								            "title": "Error: 404",
+								            "text": "That's odd. No location with this name found.. :confused:",
+								            "color": "#d40201"
+										};
+									}else{
+										data.original_message.attachments[i] = {
+								            "title": "Yes, that's gone!",
+								            "text": "Location " + data.original_message.attachments[i].title + " removed! :boom:",
+								            "color": "#50af66"
+										};
+									}
+									//Remove actions and fallback
+									delete data.original_message.attachments[i].callback_id;
+									delete data.original_message.attachments[i].actions;
+								}
+							}
+							console.log(data.original_message);
+							res.status(200).send(data.original_message);
+						});
+						break;
+					default:
+						res.status(400).send("Bad request");
+						break;
+				}
+				break;
+			default:
+				res.status(400).send("Bad request");
+				break;
+		}
+	}else{
+		res.status(401).send("Not authorized");
+	}
 });
 
 // Load page
@@ -90,14 +191,14 @@ app.get("/callback", function(req, res){
 	            if(obj.ok){
 
 	            	//Does this user exist yet?
-	            	models.User.findOneAndUpdate({token: obj.access_token}, {token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, last_active: new Date()}, function(err, u){
+	            	models.User.findOneAndUpdate({token: obj.access_token}, {token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, location: {}, last_active: new Date()}, function(err, u){
 						// If token is known, update all fields, else add them to the db
 						if(u !== null){
 							//Exists
 							res.status(200).send("User got updated in db");
 						}else{
-							const new_user = new models.User({token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, last_active: new Date()});
-							new_user.save().then(function(err, u){
+							const new_user = new models.User({token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, location: {}, last_active: new Date()});
+							new_user.save().then(function(u){
 								res.status(200).send("User got added to db");
 							});
 						}
@@ -132,42 +233,3 @@ app.get("/callback", function(req, res){
 		res.status(200).send("Working");
 	}
 });
-
-// Start server
-var httpServer = http.createServer(app);
-var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
-
-httpServer.listen(3000);
-httpsServer.listen(8443);
-
-//Start Slack-bot Earl
-bot.boot();
-
-// Run period task to clear the status of people who didn't send an update in the last 15min
-setInterval(clearStatuses, 1000*60*1);
-
-
-//Helper functions
-function updateSlackStatus(token, status){
-	const web = new WebClient(token);
-	web.users.profile.set({profile: status} )
-	  .then((res) => {
-	    //Yay
-	  })
-	  .catch(function(error){
-	  	if(error.data.error == 'profile_status_set_failed_not_valid_emoji'){
-	  		updateSlackStatus(token, {status_text: "Wrong emoji provided!", status_emoji: ":question:"})
-	  	}
-	  });
-}
-
-function clearStatuses(){
-	models.User.find({last_active: { $lte: new Date() - 15*60*1000 }}, function(err, users){
-		if(users){
-			// Loop over these users, and clear their statuses
-			for (var i = 0; i< users.length; i++){
-				updateSlackStatus(users[i].token, {status_text: "", status_emoji: ""});
-			}
-		}
-	});
-}

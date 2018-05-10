@@ -9,10 +9,12 @@ const commands = require("./commands/index");
 const bot = {
 	//Add RTM object to bot
 	rtm : null,
+	webclient: null,
 
 	//Start bot and log startup
 	boot: function(){
 		this.rtm = new RTMClient(config.bot.access_token);
+		this.webclient = new WebClient(config.bot.access_token);
 		this.rtm.start();
 		
 		this.listen();
@@ -32,11 +34,13 @@ const bot = {
 			// Log the message
 			_log("Bot", `(channel:${message.channel}) ${message.user} says: ${message.text}`);
 			var _this = this;
-			this.processInput(message).then(function(output){
-				_this.respond(output.channel, output.reply);
-			}).catch(function(error){
-				console.log(error);
-			});
+			if(message.user !== undefined && message.text !== undefined){
+				this.processInput(message).then(function(output){
+					_this.respond(output.channel, output.reply);
+				}).catch(function(error){
+					console.log(error);
+				});
+			}
 		});
 	},
 
@@ -54,9 +58,17 @@ const bot = {
 
 					//Match input against known commands
 					Object.keys(commands).forEach(function(command) {
-						if(message.text.match(commands[command].pattern)){
+						var value = "";
+						if(value = message.text.match(commands[command].pattern)){
 							//Pattern matched, execute it
-							output.reply = commands[command].exec(message.text);
+							commands[command].exec(value, user).then(function(reply){
+								output.reply = reply;
+								resolve(output);
+							}).catch(function(error){
+								//Just to make sure this is an error :)
+								output.reply = error;
+								resolve(output);								
+							});
 						}
 					});
 				}else{
@@ -65,19 +77,20 @@ const bot = {
 						channel: message.channel, 
 						reply: "Hi stranger, I don't know you at all.."
 					};
+					resolve(output);
 				}
-				
-				resolve(output);
 			});
 		})
 	},
 
 	respond: function(channelId, message){
   		//Respond to message
-		this.rtm.sendMessage(message, channelId)
-  		.then((res) => {
-    		// `res` contains information about the posted message
-  		}).catch(console.error);
+		this.webclient.chat.postMessage({channel: channelId, text: message.text, attachments: message.attachments} ).then((res) => {
+			//Yay
+		})
+		.catch(function(error){
+		  	console.log(error);
+		});
 	}
 };
 

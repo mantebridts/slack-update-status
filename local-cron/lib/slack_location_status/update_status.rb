@@ -5,11 +5,12 @@ require 'json'
 module SlackLocationStatus
   # Set the emoji and status text on Slack
   class UpdateStatus
-    def self.post(message: '', emoji: '')
+    def self.post(address: '')
       uri = URI.parse('https://api.nightknight.be/location')
+      # uri = URI.parse('http://localhost/location')
 
       header = {'Content-Type': 'application/json'}
-      payload = { token: SlackLocationStatus::Config.config['oauth_key'], status: { status_text: message, status_emoji: emoji } }
+      payload = { token: SlackLocationStatus::Config.config['oauth_key'], address: address }
 
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
