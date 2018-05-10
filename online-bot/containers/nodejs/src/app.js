@@ -195,11 +195,11 @@ app.get("/callback", function(req, res){
 						// If token is known, update all fields, else add them to the db
 						if(u !== null){
 							//Exists
-							res.status(200).send("User got updated in db");
+							res.status(200).send("User got updated in db, your token is " + obj.access_token);
 						}else{
 							const new_user = new models.User({token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, location: {}, last_active: new Date()});
 							new_user.save().then(function(err, user){
-								res.status(200).send("User got added to db");
+								res.status(200).send("User got added to db, your token is " + obj.access_token);
 
 								//Create a default location for this user
 								new models.Location({user_id: user.id, name: "Default", regex: [], status: {"status_text": "In a meeting", "status_emoji": ":calendar:"}}).save();
