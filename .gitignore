@@ -1,6 +1,7 @@
 #Ignore local logs and config
 /local-cron/log
-/local-cron/config/slack.yml
+/local-cron/lib/ruby
+/local-cron/lib/vendor
 
 #Ignore online packages, config and data
 /online-bot/containers/nodejs/src/config
