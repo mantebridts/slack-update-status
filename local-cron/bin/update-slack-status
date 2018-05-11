@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
-require File.join(File.dirname(__FILE__), '../lib/slack_location_status')
+require File.join(File.dirname(__FILE__), '../lib/app/slack_location_status')
 
-SlackLocationStatus::StatusFromLocation.set_status
+SlackLocationStatus::StatusFromLocation.set_status({token: ARGV[0]})
