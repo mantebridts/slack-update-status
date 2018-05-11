@@ -2,14 +2,47 @@ const { WebClient, RTMClient } = require('@slack/client');
 
 //Local dependancies
 const models = require('./../models/index');
+const config = require("./../config/config");
 
 // Log some stuff
-global._log = function(scope, message){
+global._log = function(scope, message, slack){
+	var slack = typeof slack  !== 'undefined' ?  slack  : false;
 	function _prefix(n) {return n<10 ? "0"+n : n}
 	var date = new Date();
 	console.log("# ------ " + scope + " ------ #");
 	console.log(_prefix(date.getHours()) + ":" + _prefix(date.getMinutes()) + ":" + _prefix(date.getSeconds()) + " --> " + message);
 	console.log(" ");
+
+	//Post to Slack #earl-development if necessary, can be either false or an object
+	if(slack !== false){
+		var attachment = {
+            "title": slack.title,
+            "text": message.text,
+            "footer": "Sneaky Earl Enterprises",
+            "footer_icon": "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2018-05-10/360767394912_20ddf9c8466bea4c62be_96.png",
+            "color": ""
+        };
+		switch(type){
+			case "danger":
+				attachment.color = "#d40201";
+				break;
+			case "success":
+				attachment.color = "#50af66";
+				break;
+			case "info":
+			default:
+				attachment.color = "";
+				break;
+		}
+		//Post to channel
+		const webclient = new WebClient(config.bot.access_token);
+		webclient.chat.postMessage({channel: "CANEXF8RL", text: "", attachments: [attachment] }).then((res) => {
+			//Yay
+		})
+		.catch(function(error){
+			// FML
+		});
+	}
 }
 
 //Update a slack-status
@@ -24,7 +57,6 @@ global._updateSlackStatus = function(token, status){
 	  	}
 	});
 }
-
 
 // Run period task to clear the status of people who didn't send an update in the last 15min
 setInterval(clearStatuses, 1000*60*10);

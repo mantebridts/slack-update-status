@@ -46,6 +46,9 @@ app.post('/location', function(req, res){
 		if(user !== null){
 			//Continue with user, find matching location for this address
 			models.Location.find({user_id: user.user_id}, "_id name regex status", function(err, locations){
+				if(err){
+					_log("Cronjob", "Locations of user #" + user.user_id + " could not be found:```" + err + "```", {type: "error", title: "Location gathering failed"});
+				}
 				//Loop over locations and match regexes
 				var current_location = false;
 				for(var i=0; i < locations.length; i++){
@@ -69,6 +72,9 @@ app.post('/location', function(req, res){
 				//Update last location of user
 				models.User.findOneAndUpdate({user_id: user.user_id}, {last_active: new Date(), location: { "address": req.body.address, "_id": current_location._id}}, function(err, u){
 					//Doesn't really matter..
+					if(err){
+						_log("Cronjob", "User #" + user.user_id + " could not update location:\n```Location:\n" + req.body.address + "\n" + current_location.name + "```\n```Error:\n" + err + "```", {type: "error", title: "Cronjob failed"});
+					}
 				});
 
 				// Send "ok", or nah
