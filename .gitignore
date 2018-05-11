@@ -12,4 +12,4 @@
 *.DS_store
 *-lock.json
 *.lock
-*.tar.gz
+traveling-*.tar.gz
