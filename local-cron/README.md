@@ -1,85 +1,48 @@
 # Slack Wifi Status
 
-Set your Slack status to either :house_with_garden: or :coffee: (or some custom emoji) based on your location.
+Set your Slack status to either :house_with_garden: or :coffee: (or some custom emoji) based on your location, which you can add via a custom Slackbot 'Earl'.
 
 You list a set of locations, if you're at that place, then your status is set to
 
 > :pick an emoji: My custom status
 
-If you are at a location not on the list, then your status is set the `else`-default
+If you are at a location not on the list, then your status is set the location with name `Default`
 
 > :coffee: At a coffee shop
 
 
 ## Setup
 
-Clone the repo:
+### 1. Setup local things
+Download [the dist/local-cron-zip](https://github.com/mantebridts/slack-update-status/blob/master/dist/cron-1.0.1-osx.tar.gz).
 
-```
-git clone git@bitbucket.org:mantebridts/slackupdatestatus.git
-```
-Install the required gems:
+### 2. Talk to the bot "Earl" on your Slack
+He'll give you a link with a Slack-button. After that, you'll get a token, which you can use in the testing
 
-```
-cd slackupdatestatus
-bundle install
-brew cask install corelocationcli
-```
-
-Create a file in `config/slack.yml` that looks like this.
-You can use `config/slack.yml.example` as a template.
-
-
-
-```yaml
-oauth_key: "xoxp-this-is-a-totally-real-oauth-key"
-kontich:
-  address:
-    - Kontich // This string is used for matchmaking against your current location, pick anything, such as a straat and number, or just the city or country
-  slack:
-    message: "@ HQ"
-    emoji: ":house:"
-else:
-  slack:
-    message: "Probably in a meeting ¯\_(ツ)_/¯"
-    emoji: ":spiral_calendar_pad:"
-```
-
-Another example:
-
-![picture](config.png)
-
-
-Instructions for getting an OAuth-key are below.
-
-
+### 3. Test your local setup
 You can test your setup by running
-
 ```
-./bin/update-slack-status
+bash cron.sh "your-secret-slack-token-here"
 ```
 
-It should update your status on Slack.
+### 4. Talk to 'Earl' on your slack to add, remove and force statusses
+Talk to the guy by using any of the following commands:
+```
+- add location: name_of_location;regex_of_location;status_message;status_emoji_name
+- list locations
+- where am i
+```
 
-## Automatically updating your status
+### 5. Setup local cron job
 
-Setup a cron job that runs every five minutes and runs `bin/update-slack-status`, use this command to use nano to edit the crontab-file:
+Setup a cron job that runs every five minutes and runs `cron.sh`, use this command to use nano to edit the crontab-file:
 
 ```export VISUAL=nano; crontab -e```
 
 and put this line in the file
 
 ```
-*/5 * * * * cd /Users/yourname/path/to/code/slack-wifi-status && ./bin/update-slack-status > /dev/null 2> /dev/null
+*/5 * * * * cd /Users/yourname/path/to/code/slack-update-status && bash cron.sh "your-secret-slack-token-here"> /dev/null 2> /dev/null
 ```
 
-
-## Detailed OAuth instructions
-
-To complete the setup, you'll need an legacy-token for Slack.
-
-Go to https://api.slack.com/custom-integrations/legacy-tokens
-
-Create a new token for the organization you're going to be changing your status on.
-
-Slack will then give you an access token. Copy it and stick it in `config/slack.yml`.
+### 6. Done
