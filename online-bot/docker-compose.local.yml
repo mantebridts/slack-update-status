@@ -1,0 +1,9 @@
+version: '3.2'
+
+services:
+  api:
+    volumes:
+      - ./containers/nodejs/src:/bot/src
+      - ./containers/nodejs/logs:/bot/logs
+    env_file:
+      - ./containers/nodejs/src/config/env/local.env

@@ -1,0 +1,8 @@
+version: '3.2'
+
+services:
+  api:
+    volumes:
+      - /etc/letsencrypt:/bot/config/cert
+    env_file:
+      - ./containers/nodejs/src/config/env/production.env

@@ -28,8 +28,7 @@ app.use(express.urlencoded({extended: true}));
 var httpServer = http.createServer(app);
 httpServer.listen(3000);
 
-var environment = "prod";
-if(environment == "prod"){
+if(process.env.NODE_ENV == "prod"){
 	const privateKey = fs.readFileSync('./config/cert/live/api.nightknight.be/privkey.pem', 'utf8');
 	const certificate = fs.readFileSync('./config/cert/live/api.nightknight.be/fullchain.pem', 'utf8');
 	var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
@@ -155,7 +154,16 @@ app.post("/api", function(req, res){
 
 // Load page
 app.get("/", function(req, res){
-	res.sendFile(path.join(__dirname + '/pages/index.html'));
+	var response = "";
+	fs.readFile(path.join(__dirname + '/pages/index.html'), 'utf8', function(err, contents){
+		if(err){
+			res.status(400).send({message: "An error occured", error: err});
+		}
+
+		response = contents;
+		response = response.replace("{(REDIRECT_URI)}", process.env.BASE_URL);
+		res.status(200).send(response);
+	})
 });
 
 // Callback page
@@ -168,7 +176,7 @@ app.get("/callback", function(req, res){
 			client_id: config.client_id,
 			client_secret: config.client_secret,
 			code: temp_code,
-			redirect_uri: (environment == "prod") ? "https://api.nightknight.be/callback" : "http://localhost/callback"
+			redirect_uri: process.env.BASE_URL + "/callback"
 		};
 
 		var options	= {
