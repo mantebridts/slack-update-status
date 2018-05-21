@@ -15,7 +15,8 @@ If you are at a location not on the list, then your status is set the location w
 
 ### 1. Setup local things
 Download [the dist/local-cron-zip](https://github.com/mantebridts/slack-update-status/blob/master/dist/cron-1.0.1-osx.tar.gz).
-Won't say this all works, but hey, you can try ¯\_(ツ)_/¯
+
+Won't say this all works, but hey, you can try ¯\\_(ツ)_/¯
 
 ### 2. Talk to the bot "Earl" on your Slack
 He'll give you a link with a Slack-button. After that, you'll get a token, which you can use in the cronjob
