@@ -246,7 +246,7 @@ app.get("/callback", function(req, res) {
 										res.status(400).send({type: "Database error", message: "Error saving default location"});
 									}
 
-									_log("Setup", "Added a new user (#" + user.user_id + ") with a new default location.", {title: "New user added", type: ""});
+									_log("Setup", "Added new user <@" + user.user_id + "> with a new default location.", {title: "New user added", type: ""});
 								})
 
 								res.status(200).send("User got added to db, your token is " + obj.access_token);
