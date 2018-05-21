@@ -4,7 +4,8 @@
 /local-cron/lib/vendor
 
 #Ignore online packages, config and data
-/online-bot/containers/nodejs/src/config
+/online-bot/containers/nodejs/src/config/cert
+/online-bot/containers/nodejs/src/config/config.js
 /online-bot/data
 /online-bot/containers/nodejs/node_modules
 /online-bot/containers/nodejs/logs
