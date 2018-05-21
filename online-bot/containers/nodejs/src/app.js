@@ -12,9 +12,6 @@ const mongo_connection_string = 'mongodb://mongodb/earl';
 //Require all global helpers
 require("./controllers/_helpers");
 
-const privateKey = fs.readFileSync('./config/cert/live/api.nightknight.be/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('./config/cert/live/api.nightknight.be/fullchain.pem', 'utf8');
-
 const config = require('./config/config'); 
 const bot = require('./controllers/bot');
 const models = require('./models/index');
@@ -29,10 +26,15 @@ app.use(express.urlencoded({extended: true}));
 
 // Start server
 var httpServer = http.createServer(app);
-var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
-
 httpServer.listen(3000);
-httpsServer.listen(8443);
+
+var environment = "prod";
+if(environment == "prod"){
+	const privateKey = fs.readFileSync('./config/cert/live/api.nightknight.be/privkey.pem', 'utf8');
+	const certificate = fs.readFileSync('./config/cert/live/api.nightknight.be/fullchain.pem', 'utf8');
+	var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
+	httpsServer.listen(8443);
+}
 
 //Start Slack-bot Earl
 bot.boot();
@@ -166,7 +168,7 @@ app.get("/callback", function(req, res){
 			client_id: config.client_id,
 			client_secret: config.client_secret,
 			code: temp_code,
-			redirect_uri: "https://api.nightknight.be/callback"
+			redirect_uri: (environment == "prod") ? "https://api.nightknight.be/callback" : "http://localhost/callback"
 		};
 
 		var options	= {
@@ -229,7 +231,7 @@ app.get("/callback", function(req, res){
 										res.status(200).send("error saving default location");
 									}
 
-									_log("Setup", "Added a new user (#" + user.user_id + ") with a new default location.", true);
+									_log("Setup", "Added a new user (#" + user.user_id + ") with a new default location.", {title: "New user added", type: ""});
 								})
 
 								res.status(200).send("User got added to db, your token is " + obj.access_token);

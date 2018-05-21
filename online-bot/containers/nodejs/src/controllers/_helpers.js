@@ -20,12 +20,12 @@ global._log = function(scope, message, slack){
 	if(slack !== false){
 		var attachment = {
             "title": slack.title,
-            "text": message.text,
+            "text": message,
             "footer": "Sneaky Earl Enterprises",
             "footer_icon": "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2018-05-10/360767394912_20ddf9c8466bea4c62be_96.png",
             "color": ""
         };
-		switch(type){
+		switch(slack.type){
 			case "danger":
 				attachment.color = "#d40201";
 				break;
@@ -43,7 +43,7 @@ global._log = function(scope, message, slack){
 			//Yay
 		})
 		.catch(function(error){
-			// FML
+			//FML
 		});
 	}
 
