@@ -72,7 +72,7 @@ app.post('/location', function(req, res){
 				//Update last location of user
 				models.User.findOneAndUpdate({user_id: user.user_id}, {last_active: new Date(), location: { "address": req.body.address, "_id": current_location._id}}, function(err, u){
 					//Doesn't really matter..
-					if(err || u = null){
+					if(err || u == null){
 						_log("Cronjob", "User #" + user.user_id + " could not update location:\n```Location:\n" + req.body.address + "\n" + current_location.name + "```\n```Error:\n" + err + "```", {type: "error", title: "Cronjob failed"});
 					}
 				});
@@ -117,15 +117,15 @@ app.post("/api", function(req, res){
 									//It's this one, check if the location even existed (might be an old message)
 									if(location.n <= 0){
 										data.original_message.attachments[i] = {
-								            "title": "Error: 404",
-								            "text": "That's odd. No location with this name found.. :confused:",
-								            "color": "#d40201"
+											"title": "Error: 404",
+											"text": "That's odd. No location with this name found.. :confused:",
+											"color": "#d40201"
 										};
 									}else{
 										data.original_message.attachments[i] = {
-								            "title": "Yes, that's gone!",
-								            "text": "Location " + data.original_message.attachments[i].title + " removed! :boom:",
-								            "color": "#50af66"
+											"title": "Yes, that's gone!",
+											"text": "Location " + data.original_message.attachments[i].title + " removed! :boom:",
+											"color": "#50af66"
 										};
 									}
 									//Remove actions and fallback
@@ -169,62 +169,87 @@ app.get("/callback", function(req, res){
 			redirect_uri: "https://api.nightknight.be/callback"
 		};
 
-		var options = {
-		    host: 'slack.com',
-		    port: 443,
-		    path: '/api/oauth.access?' + querystring.stringify(parameters),
-		    method: 'GET',
-		    headers: {
-		        'Content-Type': 'application/x-www-form-urlencoded'
-		    }
+		var options	= {
+			host: 'slack.com',
+			port: 443,
+			path: '/api/oauth.access?' + querystring.stringify(parameters),
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
 		};
 
 		var port = options.port == 443 ? https : http;
-	    var request = port.request(options, function(response){
-	        var output = '';
-	        response.setEncoding('utf8');
+		var request = port.request(options, function(response){
+			var output = '';
+			response.setEncoding('utf8');
 
-	        response.on('data', function (chunk) {
-	            output += chunk;
-	        });
+			response.on('data', function (chunk) {
+				output += chunk;
+			});
 
-	        response.on('end', function() {
-	        	//Parse response as object
-	            var obj = JSON.parse(output);
-	            console.log(obj);
+			response.on('end', function() {
+				//Parse response as object
+				var obj = JSON.parse(output);
 
-	            //Did Slack return an error?
-	            if(obj.ok){
-
-	            	//Does this user exist yet?
-	            	models.User.findOneAndUpdate({token: obj.access_token}, {token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, location: {}, last_active: new Date()}, function(err, u){
+				//Did Slack return an error?
+				if(obj.ok){
+					//Does this user exist yet?
+					models.User.findOneAndUpdate({token: obj.access_token}, {token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, location: {}, last_active: new Date()}, function(err, u){
 						// If token is known, update all fields, else add them to the db
 						if(u !== null){
 							//Exists
 							res.status(200).send("User got updated in db, your token is " + obj.access_token);
 						}else{
-							const new_user = new models.User({token: obj.access_token, user_id: obj.user_id, team_id: obj.team_id, location: {}, last_active: new Date()});
-							new_user.save().then(function(err, user){
-								res.status(200).send("User got added to db, your token is " + obj.access_token);
+							const new_user = new models.User({
+									token: obj.access_token,
+									user_id: obj.user_id,
+									team_id: obj.team_id,
+									location: {},
+									last_active: new Date()
+								});
+
+
+							new_user.save(function (err, user) {
+								if (err){
+									res.status(200).send("error saving user");
+								}
 
 								//Create a default location for this user
-								new models.Location({user_id: user.id, name: "Default", regex: [], status: {"status_text": "In a meeting", "status_emoji": ":calendar:"}}).save();
+								const default_location = new models.Location({
+									user_id: user.user_id,
+									name: "Default",
+									regex: [],
+									status: {
+										"status_text": "In a meeting",
+										"status_emoji": ":calendar:"
+									}
+								}).save(function (err, location) {
+									if (err){
+										res.status(200).send("error saving default location");
+									}
+
+									_log("Setup", "Added a new user (#" + user.user_id + ") with a new default location.", true);
+								})
+
+								res.status(200).send("User got added to db, your token is " + obj.access_token);
+
 							});
 						}
 					});
-	            }else{
-	            	//Respond with error for development
-		            res.status(200).send(obj);
-		        }
-	        });
-	    });
+				}else{
+					//Respond with error for development
+					res.status(200).send(obj);
+				}
+			});
+		});
 
-	    request.on('error', function(err) {
-	        console.log(err);
-	    });
+		request.on('error', function(err) {
+			console.log(err);
+		});
 
-	    request.end();
+		request.end();
 	}else{
-		res.status(200).send("Working");
+		res.status(200).send("Error");
 	}
 });
