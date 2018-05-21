@@ -1,4 +1,7 @@
 const { WebClient, RTMClient } = require('@slack/client');
+const chalk = require('chalk');
+const fs = require('fs');
+var stream = null, logFilename = null;
 
 //Local dependancies
 const models = require('./../models/index');
@@ -9,9 +12,9 @@ global._log = function(scope, message, slack){
 	var slack = typeof slack  !== 'undefined' ?  slack  : false;
 	function _prefix(n) {return n<10 ? "0"+n : n}
 	var date = new Date();
-	console.log("# ------ " + scope + " ------ #");
-	console.log(_prefix(date.getHours()) + ":" + _prefix(date.getMinutes()) + ":" + _prefix(date.getSeconds()) + " --> " + message);
-	console.log(" ");
+
+	//Log even in console
+	console.log(chalk.gray("[" + scope + "] - " + _prefix(date.getHours()) + ":" + _prefix(date.getMinutes()) + ":" + _prefix(date.getSeconds()) + " ") + message);
 
 	//Post to Slack #earl-development if necessary, can be either false or an object
 	if(slack !== false){
@@ -43,6 +46,16 @@ global._log = function(scope, message, slack){
 			// FML
 		});
 	}
+
+	//Write to log-file
+	//Does the logfile exist, and is it from today? If not, create it
+	var d = new Date();
+	if(stream == null || logFilename == null || (d > new Date(new Date(logFilename).getTime()+1000*60*60*24))){
+		logFilename = parseInt(d.getMonth()) + 1;
+		logFilename = d.getFullYear() + "-" + logFilename + "-" + d.getDate();
+		stream = fs.createWriteStream("logs/" + logFilename + ".log.txt", {flags: 'a'});
+	}
+	stream.write(("[" + scope + "] - " + _prefix(date.getHours()) + ":" + _prefix(date.getMinutes()) + ":" + _prefix(date.getSeconds()) + " ") + message + "\n");
 }
 
 //Update a slack-status

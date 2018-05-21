@@ -4,14 +4,16 @@
   "description": "Captures local cronjob outputs and transforms them into Slack statusupdates",
   "main": "src/app.js",
   "scripts": {
-    "start": "nodemon src/app.js"
+    "start": "FORCE_COLOR=1 nodemon src/app.js"
   },
   "author": "Koen Everaert",
   "license": "ISC",
   "dependencies": {
     "@slack/client": "^4.1.0",
+    "chalk": "^2.4.1",
     "express": "^4.16.3",
     "mongoose": "^5.0.16",
-    "nodemon": "1.12.*"
+    "nodemon": "1.12.*",
+    "read-last-line": "^1.1.0"
   }
 }

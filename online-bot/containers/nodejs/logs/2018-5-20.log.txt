@@ -1,0 +1,6 @@
+[Bot] - 19:10:10 Bot started listening
+[Bot] - 19:10:18 (channel:DAM8WKBNH) UA9NU6STC says: Sup
+[Bot] - 19:10:19 (channel:DAM8WKBNH) UA9NU6STC says: Hey
+[Bot] - 19:15:07 Bot started listening
+[Bot] - 19:23:10 (channel:DALTKLR5J) UA8U5QYMA says: list locations
+[Bot] - 19:23:57 Bot started listening
