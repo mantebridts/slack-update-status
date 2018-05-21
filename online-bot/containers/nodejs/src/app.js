@@ -84,7 +84,7 @@ app.post('/location', function(req, res){
 				res.status(200).send("ok");
 			});
 		} else {
-			res.status(404).send({ message: "User / token combination not found"});
+			res.status(404).send({type: "Authorization required", message: "User / token combination not found"});
 		}
 	});
 });
@@ -140,16 +140,16 @@ app.post("/api", function(req, res){
 						});
 						break;
 					default:
-						res.status(400).send("Bad request");
+						res.status(417).send({type: "Bad request", message: "Parameters not recognized"});
 						break;
 				}
 				break;
 			default:
-				res.status(400).send("Bad request");
+				res.status(417).send({type: "Bad request", message: "Parameters not recognized"});
 				break;
 		}
 	} else {
-		res.status(401).send("Not authorized");
+		res.status(401).send({type: "Authorization required", message: "Not authorized"});
 	}
 });
 
@@ -158,7 +158,7 @@ app.get("/", function(req, res){
 	var response = "";
 	fs.readFile(path.join(__dirname + '/pages/index.html'), 'utf8', function(err, contents){
 		if(err){
-			res.status(400).send({message: "An error occured", error: err});
+			res.status(400).send({type: "File read error", message: err});
 		}
 
 		response = contents;
@@ -228,7 +228,7 @@ app.get("/callback", function(req, res) {
 
 							new_user.save(function (err, user) {
 								if (err) {
-									res.status(200).send("error saving user");
+									res.status(400).send({type: "Database error", message: "Error saving user"});
 								}
 
 								// Create a default location for this user
@@ -242,7 +242,7 @@ app.get("/callback", function(req, res) {
 									}
 								}).save(function (err, location) {
 									if (err) {
-										res.status(200).send("Error saving default location");
+										res.status(400).send({type: "Database error", message: "Error saving default location"});
 									}
 
 									_log("Setup", "Added a new user (#" + user.user_id + ") with a new default location.", {title: "New user added", type: ""});
@@ -261,11 +261,11 @@ app.get("/callback", function(req, res) {
 		});
 
 		request.on('error', function(err) {
-			console.log(err);
+			res.status(400).send({type: "Resource error", message: err});
 		});
 
 		request.end();
 	} else {
-		res.status(200).send("Error");
+		res.status(417).send({type: "Missing parameter", message: "Temporary Slack code not provided"});
 	}
 });
