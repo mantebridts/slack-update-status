@@ -8,6 +8,21 @@ const models = require('./../models/index');
 const config = require("./../config/config");
 
 // Log some stuff
+
+/*
+How to create a good log:
+
+    _log(scope, message, slack);
+
+Explanation:
+    scope: string
+    message: string
+    slack: false | {
+        title: string
+        type: string ("danger" | "success" | "info")
+    }
+*/
+
 global._log = function(scope, message, slack){
 	var slack = typeof slack  !== 'undefined' ?  slack  : false;
 	function _prefix(n) {return n<10 ? "0"+n : n}
