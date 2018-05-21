@@ -38,7 +38,7 @@ const bot = {
 				this.processInput(message).then(function(output){
 					_this.respond(output.channel, output.reply);
 				}).catch(function(error){
-					console.log(error);
+		  			_log("processInput", error);
 				});
 			}
 		});
@@ -100,7 +100,7 @@ const bot = {
 			//Yay
 		})
 		.catch(function(error){
-		  	console.log(error);
+		  	_log("Respond", error);
 		});
 	}
 };
