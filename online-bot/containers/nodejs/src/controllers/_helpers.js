@@ -12,15 +12,15 @@ const config = require("./../config/config");
 /*
 How to create a good log:
 
-    _log(scope, message, slack);
+	_log(scope, message, slack);
 
 Explanation:
-    scope: string
-    message: string
-    slack: false | {
-        title: string
-        type: string ("danger" | "success" | "info")
-    }
+	scope: string
+	message: string
+	slack: false | {
+		title: string
+		type: string ("danger" | "success" | "info")
+	}
 */
 
 global._log = function(scope, message, slack){
@@ -34,12 +34,10 @@ global._log = function(scope, message, slack){
 	//Post to Slack #earl-development if necessary, can be either false or an object
 	if(slack !== false){
 		var attachment = {
-            "title": slack.title,
-            "text": message,
-            "footer": "Sneaky Earl Enterprises",
-            "footer_icon": "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2018-05-10/360767394912_20ddf9c8466bea4c62be_96.png",
-            "color": ""
-        };
+			"title": slack.title,
+			"text": message,
+			"color": ""
+		};
 		switch(slack.type){
 			case "danger":
 				attachment.color = "#d40201";
@@ -80,9 +78,9 @@ global._updateSlackStatus = function(token, status){
 	//Yay
 	})
 	.catch(function(error){
-	  	if(error.data.error == 'profile_status_set_failed_not_valid_emoji'){
-	  		_updateSlackStatus(token, {status_text: "Wrong emoji provided!", status_emoji: ":question:"})
-	  	}
+		if(error.data.error == 'profile_status_set_failed_not_valid_emoji'){
+			_updateSlackStatus(token, {status_text: "Wrong emoji provided!", status_emoji: ":question:"})
+		}
 	});
 }
 
