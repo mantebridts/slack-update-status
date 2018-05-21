@@ -121,13 +121,8 @@ const bot = {
 		}).then((res) => {
 			// Our bot responded, yay!
 		})
-<<<<<<< Updated upstream
 		.catch(function(error){
 		  	_log("Respond", error);
-=======
-		.catch(function(error) {
-			console.log(error);
->>>>>>> Stashed changes
 		});
 	}
 };
