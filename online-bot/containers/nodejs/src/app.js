@@ -92,14 +92,14 @@ app.post('/location', function(req, res){
 
 // Captures button-responses from Slack
 app.post("/api", function(req, res){
-	var payload = JSON.parse(req.body.payload);
-	var data = {
-		"token": payload.token,
-		"callback_id": payload.callback_id,
-		"user_id": payload.user.id,
-		"original_message": payload.original_message,
-		"team_id": payload.team.id
-	};
+	var payload = JSON.parse(req.body.payload),
+		data = {
+			"token": payload.token,
+			"callback_id": payload.callback_id,
+			"user_id": payload.user.id,
+			"original_message": payload.original_message,
+			"team_id": payload.team.id
+		};
 
 	// 1. Does the token matches what we know of Slack? (Is this request from Slack?)
 	if (config.verification_token == data.token) {
@@ -116,8 +116,6 @@ app.post("/api", function(req, res){
 					case "location":
 						models.Location.findOne({_id: id, user_id: data.user_id}).remove(function(err, location) {
 							// Replace original_message attachment with response and send it back
-							console.log(err);
-							console.log(location);
 							for (var i = 0; i < data.original_message.attachments.length; i++) {
 								if (data.original_message.attachments[i].callback_id == data.callback_id) {
 									// It's this one, check if the location even existed (might be an old message)
@@ -231,8 +229,8 @@ app.get("/callback", function(req, res) {
 									name: "Default",
 									regex: [],
 									status: {
-										"status_text": "In a meeting",
-										"status_emoji": ":calendar:"
+										"status_text": "Working hard",
+										"status_emoji": ":computer:"
 									}
 								}).save(function (err, location) {
 									if (err) {
