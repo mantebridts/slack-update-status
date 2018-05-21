@@ -16,7 +16,7 @@ const bot = {
 		this.rtm = new RTMClient(config.bot.access_token);
 		this.webclient = new WebClient(config.bot.access_token);
 		this.rtm.start();
-		
+
 		this.listen();
 	},
 
@@ -47,7 +47,7 @@ const bot = {
 	processInput: async function(message){
 		return new Promise(function(resolve, reject){
 			var output = {
-				channel: message.channel, 
+				channel: message.channel,
 				reply: {
 					text: "Didn't quite catch that..\nTry something like this:\n```add location: Name-of-location;regex-for-location;status-text;name-of-status-emoji(without ':') //Adds a new location\nlist locations //Lists your locations\n@Name-of-location //Force-updates location\nwhere am i //Returns last known position```"
 				}
@@ -71,7 +71,7 @@ const bot = {
 							}).catch(function(error){
 								//Just to make sure this is an error :)
 								output.reply = error;
-								resolve(output);								
+								resolve(output);
 							});
 						}
 					});
@@ -83,9 +83,9 @@ const bot = {
 				}else{
 					//Ask user to authorize Bot
 					output = {
-						channel: message.channel, 
+						channel: message.channel,
 						reply: {
-							text: "Hi stranger, I don't know you at all.."
+							text: "Hi stranger, I don't know you at all.. Add my app to slack maybe?"
 						}
 					};
 					resolve(output);
