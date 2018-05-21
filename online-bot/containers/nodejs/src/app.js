@@ -24,10 +24,11 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// Start server
+// Start http-server
 var httpServer = http.createServer(app);
 httpServer.listen(3000);
 
+// If environment is production, start https-server as well
 if(process.env.NODE_ENV == "prod"){
 	const privateKey = fs.readFileSync('./config/cert/live/api.nightknight.be/privkey.pem', 'utf8');
 	const certificate = fs.readFileSync('./config/cert/live/api.nightknight.be/fullchain.pem', 'utf8');
