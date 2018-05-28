@@ -8,6 +8,8 @@ var addLocation = new Command("add-location");
 
 addLocation.addStep(/^add location/i, "Super, let's start, hoe wil je de nieuwe locatie noemen?", async function(message, user){
 	return new Promise(function(resolve, reject) {
+		addLocation.data = null;
+
 		//Does a location with this name already exist?
 		models.Location.findOne({name: message.text, user_id: user.user_id}, "_id", function(err, location){
 			if(location){
