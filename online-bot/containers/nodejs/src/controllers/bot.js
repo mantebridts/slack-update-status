@@ -5,6 +5,7 @@ const { WebClient, RTMClient } = require('@slack/client');
 const config = require('./../config/config');
 const models = require('./../models/index');
 const commands = require("./commands/index");
+const Command = require("./../classes/Command");
 
 const bot = {
 	// Add RTM object to bot
@@ -56,65 +57,107 @@ const bot = {
 	},
 
 	processInput: async function(message) {
+		var _this = this;
 		return new Promise(function(resolve, reject) {
 			// Default message
 			var output = {
-					channel: message.channel,
-					reply: {
-						attachments: [
-							{
-								"fallback": "",
-								"title": "Commands I listen to\n\n",
-								"fields": [
-									{
-										"title": "Command",
-										"value": "`add location`\n\n\n\n\n\n\n\n\n`list locations`\n\n `where am I`\n\n",
-										"short": true
-									},
-									{
-										"title": "Explanation",
-										"value": "name-of-location;regex-for-location;status-text;name-of-status-emoji-without’:'\n\n\n lists your locations\n\n returns last known location\n\n",
-										"short": true
-									}
-								]
-							}
-						]
-					}
+				channel: message.channel,
+				reply: {
+					attachments: [
+						{
+							"fallback": "",
+							"title": "Commands I listen to\n\n",
+							"fields": [
+								{
+									"title": "Command",
+									"value": "`add location`\n\n\n\n\n\n\n\n\n`list locations`\n\n `where am I`\n\n",
+									"short": true
+								},
+								{
+									"title": "Explanation",
+									"value": "name-of-location;regex-for-location;status-text;name-of-status-emoji-without’:'\n\n\n lists your locations\n\n returns last known location\n\n",
+									"short": true
+								}
+							]
+						}
+					]
 				}
+			}
 
 			// Check if user is already registered.
-			models.User.findOne({user_id: message.user}, "user_id", function(err, user) {
+			models.User.findOne({user_id: message.user}, "user_id flow", function(err, user) {
 				if (user !== null) {
 					// Good, we know this user, start working
-					// Match input against all known commands
-					var matched = false;
-					Object.keys(commands).forEach(function(command) {
-						var matches = message.text.match(commands[command].pattern);
-						if(matches != null){
-							//Pattern matched, execute it
-							matched = true;
-							commands[command].exec(matches, user).then(function(reply) {
-								output.reply = reply;
-								resolve(output);
-							}).catch(function(error) {
-								//Just to make sure this is an error :)
-								output.reply = error;
-								resolve(output);
-							});
-						}
-					});
 
-					//By now no response was ready, so let's just.. say gibberish
-					if (!matched) {
+					// Did user abort the flow?
+					if(message.text.toLowerCase() == "stop"){
+						Command.clearSteps(user);	
+						output.reply = {text: "Okay okay, we'll stop here"};
 						resolve(output);
+					}
+					
+					// No? Great.
+					/*
+					 * 1. Gebruiker stuurt commando naar Earl
+					 * 2. Zit gebruiker reeds in een flow?
+					 -> Nee
+					 * 		3. Check commando met alle eerste stappen van commando's
+					 * 		4a. Indien iets gevonden, sla stap op in db en antwoordt met eerste vraag
+					 * 		4b. Indien niets gevonden, print lijst met mogelijke commando's
+					 -> Ja
+					 *		3. Check of antwoord volstaat door callback van stap in commando uit te voeren
+					 * 		4a. Indien oké, antwoordt met eventuele feedback, ga naar volgende stap, en stel die vraag
+					 * 		4b. Indien niet oké, print herhaling, of stel zelf herhaling op
+					 * 5. Indien flow gedaan is, reset naar 'null'
+					 */
+
+					if(user.flow == "null"){
+						//Loop over first step of all commands, this only happens when a user is out of a flow
+						Object.keys(commands).forEach(function(key){
+							var command = commands[key];
+							var matches = message.text.match(command.getStep(0).pattern);
+							//There's a match for the first command, ask the question and update the flow
+							if (matches != null){
+								//Save state to db
+								var stepId = 0;
+								command.saveStep(stepId, user);
+								output.reply = command.question(stepId);
+								resolve(output);
+							}
+						});
+
+						//If nothing worked, give the user just a help-response
+						resolve(output);
+					}else{
+						/*
+						 * Happens more often, in this case, the user has an active flow, and answered a question
+						*/
+						commands[user.flow.name].processAnswer(user.flow.step, message, user).then(function(validation){
+							// Response is sufficient for command, proceed to next step
+							if(validation){
+								// If the response is an object, respond first
+								if(validation instanceof Object){
+									console.log(validation);
+									_this.respond(output.channel, validation);
+								}
+
+								//Save the next step to db, and ask that question
+								var stepId = user.flow.step+1;
+								commands[user.flow.name].saveStep(stepId, user).then(function(response){
+									output.reply = commands[user.flow.name].question(stepId);
+									resolve(output);
+								})
+							}
+						}).catch(function(repeatHelp){
+							// Reply from user was rejected, ask the question again
+							output.reply = repeatHelp ? repeatHelp : {text: "Better try again, I didn't catch that.\n_(Or, if you want to quit, say 'stop')_"};
+							resolve(output);
+						});
 					}
 				} else {
 					//Ask user to authorize Bot
-					output = {
-						channel: message.channel,
-						reply: {
-							text: "Hi stranger, I don't know you at all... Maybe add this app to?"
-						}
+					output.reply = {
+						text: "Hi stranger, I don't know you at all... Maybe add this app to?"
 					};
 					resolve(output);
 				}
@@ -124,6 +167,9 @@ const bot = {
 
 	respond: function(channelId, message) {
 		//Respond to message
+		if(message.text == undefined){
+			console.log(message);
+		}
 		this.webclient.chat.postMessage({
 			channel: channelId,
 			text: message.text,
