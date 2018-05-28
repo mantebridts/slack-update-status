@@ -4,8 +4,15 @@ const User = mongoose.model('User', {
 	token: String,
 	user_id: String,
 	team_id: String,
-	location: Object, // Contains {address: "...", _id: reference_to_location_Id}
-	last_active: Date
+	location: {
+		address: String,
+		_id: mongoose.Schema.Types.ObjectId
+	},
+	last_active: Date,
+	flow: {
+		name: String,
+		step: Number
+	}
 });
 
 module.exports = User;
