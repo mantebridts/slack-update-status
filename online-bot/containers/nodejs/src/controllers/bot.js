@@ -94,65 +94,65 @@ const bot = {
 						Command.clearSteps(user);	
 						output.reply = {text: "Okay okay, we'll stop here"};
 						resolve(output);
-					}
-					
-					// No? Great.
-					/*
-					 * 1. Gebruiker stuurt commando naar Earl
-					 * 2. Zit gebruiker reeds in een flow?
-					 -> Nee
-					 * 		3. Check commando met alle eerste stappen van commando's
-					 * 		4a. Indien iets gevonden, sla stap op in db en antwoordt met eerste vraag
-					 * 		4b. Indien niets gevonden, print lijst met mogelijke commando's
-					 -> Ja
-					 *		3. Check of antwoord volstaat door callback van stap in commando uit te voeren
-					 * 		4a. Indien oké, antwoordt met eventuele feedback, ga naar volgende stap, en stel die vraag
-					 * 		4b. Indien niet oké, print herhaling, of stel zelf herhaling op
-					 * 5. Indien flow gedaan is, reset naar 'null'
-					 */
-
-					if(user.flow == "null"){
-						//Loop over first step of all commands, this only happens when a user is out of a flow
-						Object.keys(commands).forEach(function(key){
-							var command = commands[key];
-							var matches = message.text.match(command.getStep(0).pattern);
-							//There's a match for the first command, ask the question and update the flow
-							if (matches != null){
-								//Save state to db
-								var stepId = 0;
-								command.saveStep(stepId, user);
-								output.reply = command.question(stepId);
-								resolve(output);
-							}
-						});
-
-						//If nothing worked, give the user just a help-response
-						resolve(output);
 					}else{
+						// No? Great.
 						/*
-						 * Happens more often, in this case, the user has an active flow, and answered a question
-						*/
-						commands[user.flow.name].processAnswer(user.flow.step, message, user).then(function(validation){
-							// Response is sufficient for command, proceed to next step
-							if(validation){
-								// If the response is an object, respond first
-								if(validation instanceof Object){
-									console.log(validation);
-									_this.respond(output.channel, validation);
-								}
+						 * 1. Gebruiker stuurt commando naar Earl
+						 * 2. Zit gebruiker reeds in een flow?
+						 -> Nee
+						 * 		3. Check commando met alle eerste stappen van commando's
+						 * 		4a. Indien iets gevonden, sla stap op in db en antwoordt met eerste vraag
+						 * 		4b. Indien niets gevonden, print lijst met mogelijke commando's
+						 -> Ja
+						 *		3. Check of antwoord volstaat door callback van stap in commando uit te voeren
+						 * 		4a. Indien oké, antwoordt met eventuele feedback, ga naar volgende stap, en stel die vraag
+						 * 		4b. Indien niet oké, print herhaling, of stel zelf herhaling op
+						 * 5. Indien flow gedaan is, reset naar 'null'
+						 */
 
-								//Save the next step to db, and ask that question
-								var stepId = user.flow.step+1;
-								commands[user.flow.name].saveStep(stepId, user).then(function(response){
-									output.reply = commands[user.flow.name].question(stepId);
+						if(user.flow == "null"){
+							//Loop over first step of all commands, this only happens when a user is out of a flow
+							Object.keys(commands).forEach(function(key){
+								var command = commands[key];
+								var matches = message.text.match(command.getStep(0).pattern);
+								//There's a match for the first command, ask the question and update the flow
+								if (matches != null){
+									//Save state to db
+									var stepId = 0;
+									command.saveStep(stepId, user);
+									output.reply = command.question(stepId);
 									resolve(output);
-								})
-							}
-						}).catch(function(repeatHelp){
-							// Reply from user was rejected, ask the question again
-							output.reply = repeatHelp ? repeatHelp : {text: "Better try again, I didn't catch that.\n_(Or, if you want to quit, say 'stop')_"};
+								}
+							});
+
+							//If nothing worked, give the user just a help-response
 							resolve(output);
-						});
+						}else{
+							/*
+							 * Happens more often, in this case, the user has an active flow, and answered a question
+							*/
+							commands[user.flow.name].processAnswer(user.flow.step, message, user).then(function(validation){
+								// Response is sufficient for command, proceed to next step
+								if(validation){
+									// If the response is an object, respond first
+									if(validation instanceof Object){
+										console.log(validation);
+										_this.respond(output.channel, validation);
+									}
+
+									//Save the next step to db, and ask that question
+									var stepId = user.flow.step+1;
+									commands[user.flow.name].saveStep(stepId, user).then(function(response){
+										output.reply = commands[user.flow.name].question(stepId);
+										resolve(output);
+									})
+								}
+							}).catch(function(repeatHelp){
+								// Reply from user was rejected, ask the question again
+								output.reply = repeatHelp ? repeatHelp : {text: "Better try again, I didn't catch that.\n_(Or, if you want to quit, say 'stop')_"};
+								resolve(output);
+							});
+						}
 					}
 				} else {
 					//Ask user to authorize Bot
