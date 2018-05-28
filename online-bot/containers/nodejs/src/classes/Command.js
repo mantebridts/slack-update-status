@@ -17,12 +17,23 @@ class Command {
 		return this._name;
 	}
 
-	// Name
+	// needsNoAnswer
 	set needsNoAnswer(needsNoAnswer){
 		this._needsNoAnswer = needsNoAnswer;
 	}
 	get needsNoAnswer(){
 		return this._needsNoAnswer;
+	}
+
+	// Optional data
+	set data(data){
+		this._data = data;
+	}
+	get data(){
+		return this._data;
+	}
+	addData(data){
+		Object.assign(this._data, data);
 	}
 
 	// Question
