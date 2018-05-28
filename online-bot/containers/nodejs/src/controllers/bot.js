@@ -31,6 +31,11 @@ const bot = {
 				return;
 			}
 
+			// Skip messages not in direct message that are not directed to my own user ID
+			if (message.channel.charAt(0) !== "D" && message.text.indexOf("<@" + this.rtm.activeUserId + ">") == -1){
+				return;
+			}
+
 			// Log the message
 			_log("Bot", `(channel:${message.channel}) ${message.user} says: ${message.text}`);
 
