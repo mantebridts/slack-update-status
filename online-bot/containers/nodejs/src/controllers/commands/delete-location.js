@@ -4,7 +4,6 @@ const models = require('./../../models/index');
 
 var deleteLocation = new Command("delete-location");
 
-//Require user to say "start steps" to start
 deleteLocation.addStep(/^delete/i, {text: "Sure, what location would you like to delete?"}, async function(message, user){
 	return new Promise(function(resolve, reject) {
 		//Does a location with this name exist?
