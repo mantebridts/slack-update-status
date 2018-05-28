@@ -37,7 +37,6 @@ const bot = {
 			}
 
 			// Skip messages that (if set) are not from my developer
-			console.log(process.env.USER_ID);
 			if (process.env.USER_ID !== undefined && message.user !== process.env.USER_ID){
 				return;
 			}
