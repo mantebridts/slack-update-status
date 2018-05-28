@@ -10,6 +10,7 @@
 /online-bot/data
 /online-bot/containers/nodejs/node_modules
 /online-bot/containers/nodejs/logs
+/online-bot/containers/nodejs/src/config/env/local.env
 
 #Ignore .DS_store and lockfiles
 *.DS_store
