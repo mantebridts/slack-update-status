@@ -67,7 +67,7 @@ class Command {
 					resolve(reply);
 				}).catch(function(repeatHelp) {
 					// If it failed, return false or a reminder
-					if(!(repeatHelp instanceof Object)){
+					if(!(repeatHelp instanceof Object) && repeatHelp !== false){
 						repeatHelp = {text: repeatHelp};
 					}
 					reject(repeatHelp);
