@@ -3,9 +3,10 @@ const config = require('./../config/config');
 const models = require('./../models/index');
 
 class Command {
-	constructor(name){
+	constructor(name, needsNoAnswer){
 		this._name = name;
 		this._steps = [];
+		this._needsNoAnswer = needsNoAnswer;
 	}
 
 	// Name
@@ -14,6 +15,14 @@ class Command {
 	}
 	get name(){
 		return this._name;
+	}
+
+	// Name
+	set needsNoAnswer(needsNoAnswer){
+		this._needsNoAnswer = needsNoAnswer;
+	}
+	get needsNoAnswer(){
+		return this._needsNoAnswer;
 	}
 
 	// Question

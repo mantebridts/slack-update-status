@@ -112,21 +112,42 @@ const bot = {
 
 						if(user.flow == "null"){
 							//Loop over first step of all commands, this only happens when a user is out of a flow
+							var matches = null;
 							Object.keys(commands).forEach(function(key){
 								var command = commands[key];
-								var matches = message.text.match(command.getStep(0).pattern);
-								//There's a match for the first command, ask the question and update the flow
-								if (matches != null){
-									//Save state to db
-									var stepId = 0;
-									command.saveStep(stepId, user);
-									output.reply = command.question(stepId);
-									resolve(output);
+								if(matches == null){
+									matches = message.text.match(command.getStep(0).pattern);
+									//There's a match for the first command, ask the question and update the flow
+									if (matches != null){
+										if(command.needsNoAnswer){
+											command.processAnswer(0, message, user).then(function(validation){
+												// Response is sufficient for command, proceed to next step
+												if(validation){
+													// If the response is an object, respond first
+													if(validation instanceof Object){
+														_this.respond(output.channel, validation);
+													}
+												}
+											}).catch(function(repeatHelp){
+												// Reply from user was rejected, ask the question again
+												output.reply = repeatHelp ? repeatHelp : {text: "Better try again, I didn't catch that.\n_(Or, if you want to quit, say 'stop')_"};
+												resolve(output);
+											});
+										}else{
+											//Save state to db
+											var stepId = 0;
+											command.saveStep(stepId, user);
+											output.reply = command.question(stepId);
+											resolve(output);
+										}
+									}
 								}
 							});
 
 							//If nothing worked, give the user just a help-response
-							resolve(output);
+							if(matches == null){
+								resolve(output);
+							}
 						}else{
 							/*
 							 * Happens more often, in this case, the user has an active flow, and answered a question
@@ -136,7 +157,6 @@ const bot = {
 								if(validation){
 									// If the response is an object, respond first
 									if(validation instanceof Object){
-										console.log(validation);
 										_this.respond(output.channel, validation);
 									}
 
